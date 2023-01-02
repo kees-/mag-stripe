@@ -1,0 +1,8 @@
+{:paths ["." "src"]
+ :deps {etaoin/etaoin {:mvn/version "1.0.39"}}
+ :tasks {scrape {:doc "Write posts from a specified platform to an edn file. You must specify particular keys."
+                 :requires ([mag-stripe.swipe]
+                            [taoensso.timbre :as timbre])
+                 :enter (timbre/set-level! :error)
+                 :task (exec 'mag-stripe.swipe/write!)
+                 :exec-args {:append? true}}}}
