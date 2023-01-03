@@ -1,5 +1,7 @@
 (ns mag-stripe.util)
 
+(def printlnf (comp println format))
+
 ;; https://stackoverflow.com/a/1879961
 (defn- try-times*
   "Executes thunk. If an exception is thrown, will retry. At most n retries

@@ -8,50 +8,50 @@
 
 ## Sources
 
+The following platforms are available.
+
+- `:n+1`
+- `:substack`
+- `:spike-art-magazine`
+
+Scraping will return as many posts as possible, each with at least this data:
+
+- `:url`
+- `:content`
+- `:source` (author or publication name)
+- `:title`
+- `:hero`
+- `:byline`
+
 All sources can take these keys as an options map, or as CLI args:
 
 Key | Description | Default | Required?
 --- | --- | --- | ---
-`:platform` | The platform you're scraping from (see list). | | Yes
-`:outfile` | Where your data will be captured. | | Yes
-`:append?` | Utility will read from a preexisting outfile and append new entries, otherwise will overwrite. | `false` |
+`:platform` | The platform you're scraping from, see list below. | | Yes
+`:outfile` | Where your data will be captured. | `"target/posts.edn"` |
+`:append?` | Utility will read from a preexisting outfile and append new entries, otherwise will overwrite. | `true` |
 `:path-browser` | Path to a browser executable, in case Chrome isn't found at the default location | etaoin default |
 `:driver-log-level` | (Not relevant in babashka) Set how verbose the webdriver process is | `"SEVERE"` |
 `:log-level` | (Not relevant in babashka) How verbose the browser runtime is | `:error` |
 `:limit` | Don't look for more than this many posts. | unset (unlimited) |
-`:headless` | Good for debugging visually, whether to display web browser. | `true` |
+`:headless` | Good for debugging visually, `false` will display web browser. | `true` |
 `:timeout` | How many seconds certain `wait` operations should hang. | `15` |
 `:retries` | How many times should failed operations retry. | `3` (4 total) |
-
-The following platforms are available.
-
-- `:nplusone`
-- `:substack`
-- `:spike-art-magazine`
-
-Scraping any platform will return as many posts as possible, each with at least this data:
-
-- `:url`
-- `:content`
-- `:source`
-- `:title`
-- `:hero`
-- `:byline`
 
 Each platform takes, and can return, a number of additional keys.
 
 ### n+1
 
-Will return public posts (not paywalled or print-only).
+Will return public posts (neither paywalled nor print-only).
 
 Key | Description | Default | Required?
 --- | --- | --- | ---
-`:query` | The method you're using to find content (e.g, `tag`, `magazine`, `authors`) | | Yes
-`:slug` | What to look for (e.g, `baer-hannah`, `issue-39`) | | Yes
+`:query` | The method you're using to find content, e.g `tag`, `magazine`, `authors` | | Yes
+`:slug` | What to look for, e.g `baer-hannah`, `issue-39` | | Yes
 
 Example:
 ```sh
-bb scrape :platform :nplusone :query :magazine :slug :issue-33
+bb scrape :platform n+1 :query magazine :slug issue-33
 ```
 
 Todo:
@@ -70,7 +70,7 @@ Key | Description | Default | Required?
 
 Example:
 ```sh
-bb scrape :platform :spike-art-magazine :query contributors :slug dean-kissick-0
+bb scrape :platform spike-art-magazine :query contributors :slug dean-kissick-0
 ```
 
 ### Substack
@@ -86,7 +86,7 @@ Key | Description | Default | Required?
 
 Example:
 ```sh
-bb scrape :platform :substack :domain 'https://circularrainbowmonasteries.substack.com/'
+bb scrape :platform substack :domain 'https://circularrainbowmonasteries.substack.com/'
 ```
 
 TODO, ignore paywalled posts and/or authenticate.
