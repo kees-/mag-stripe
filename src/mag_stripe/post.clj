@@ -1,7 +1,8 @@
 (ns mag-stripe.post
   (:require [etaoin.api :as e]
             [mag-stripe.util :as util]
-            [mag-stripe.helpers.nplusone :as n+1]))
+            [mag-stripe.helpers.nplusone :as n+1]
+            [clojure.string :as s]))
 
 (defn- outer-htmlv
   [d data]
@@ -50,8 +51,23 @@
            d {:css "meta[property='og:title']"}
            "content")))
 
+(defmethod parse* :system
+  [_ d post]
+  (assoc
+   post
+   :source (if (e/exists? d {:css ".article-header__credits"})
+             (e/get-element-text d {:css ".article-header__credits"})
+             (e/get-element-attr d {:css "meta[property='og:title']"} "content"))
+   :content (outer-htmlv d (e/query-all d {:css ".page-blocks > section"}))
+   :byline (e/get-element-text d {:css ".article-header__title"})
+   :introduction (when (e/exists? d {:css ".article-header__introduction"})
+                  (e/get-element-text d {:css ".article-header__introduction"}))
+   :datetime (e/get-element-attr d {:css "meta[name='date']"} "content")
+   :hero (when (e/exists? d {:css ".article-header__hero"})
+           (e/get-element-text d {:css ".article-header__hero noscript"}))))
+
 (defn parse
   [opts d post]
-  (println "Parsing" (:url post))
+  (println "Parsing" (s/replace (:url post) #"^.+?\/\/[^\/]+?\/" ""))
   (e/go d (:url post))
   (util/try-times (:retries opts) (parse* opts d post)))

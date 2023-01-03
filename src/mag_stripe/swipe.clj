@@ -26,6 +26,17 @@
     (keyword? o) o
     :else o))
 
+(defn- form-opts
+  [opts]
+  (let [{:keys [outfile] :as opts} (merge defaults opts)]
+    (-> (merge defaults opts)
+        (update :platform ->keyword)
+        (assoc :existing
+               (if (and (:append? opts)
+                        (fs/exists? outfile))
+                 (edn/read-string (slurp outfile))
+                 [])))))
+
 #_{:clj-kondo/ignore [:unresolved-symbol]}
 (defn- scrape*
   [opts]
@@ -63,6 +74,13 @@
     (scrape*
      (assoc opts :url url))))
 
+(defmethod scrape :system
+  [opts]
+  (let [url (format "https://system-magazine.com/%s/%s"
+                    (:query opts) (:slug opts))]
+    (scrape*
+     (assoc opts :url url))))
+
 (defmethod scrape
   :default
   [_]
@@ -80,20 +98,13 @@
 #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (defn write!
   [opts]
-  (let [{:keys [outfile] :as opts} (merge defaults opts)
-        opts (-> (merge defaults opts)
-                 (update :platform ->keyword)
-                 (assoc :existing
-                        (if (and (:append? opts)
-                                 (fs/exists? outfile))
-                          (edn/read-string (slurp outfile))
-                          [])))]
-    (fs/create-dirs (fs/parent outfile))
+  (let [opts (form-opts opts)]
+    (fs/create-dirs (fs/parent (:outfile opts)))
     (when (:append? opts) (println (count (:existing opts)) "existing posts found."))
     (->> (scrape opts)
          (remove :paywalled?)
          (sort-by :datetime)
          reverse
          (mapv #(dissoc % :paywalled?))
-         (spit outfile))
+         (spit (:outfile opts)))
     (println "Complete" (char 0x3020))))

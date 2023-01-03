@@ -69,7 +69,6 @@
 (defmethod parse* :substack
   [opts d]
   (substack/scroll-full-page! d)
-  (println "Searching for unparsed posts")
   (let [source (e/get-element-text d {:tag :h1})
         posts (e/query-all d {:css ".post-preview"})
         data (fn [el]
@@ -83,6 +82,18 @@
                            "datetime")
                 :hero (e/get-element-inner-html-el
                        d (e/child d el {:tag :picture}))})]
+    (process opts posts data)))
+
+(defmethod parse* :system
+  [opts d]
+  (let [posts (e/query-all d {:css ".section > a"})
+        data (fn [el]
+               {:title (->> (e/get-element-text-el
+                             d (e/child d el {:css ".articles-item__title"}))
+                            (re-find #"^[^?]+"))
+                :url (e/get-element-attr-el d el "href")
+                :issue (e/get-element-text-el
+                        d (e/child d el {:css ".articles-item__info span:last-child"}))})]
     (process opts posts data)))
 
 (defn parse

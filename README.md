@@ -2,9 +2,11 @@
 
  Swipe content from mags.
 
- This utility uses [Babashka](https://book.babashka.org/#libraries) and [etaoin](https://github.com/clj-commons/etaoin) to scrape articles from publications and blogs and save them as EDN. It supports many[^1] domains!
+ This utility uses [etaoin](https://github.com/clj-commons/etaoin) to scrape articles from publications and blogs and save them as EDN. It supports many[^1] domains!
 
- Use the babashka task `scrape` to download posts from the command line.
+ Use the Babashka task `bb scrape` to download posts from the command line.
+ 
+ You will be able to do very little with the resulting data on its own. Imagine this utility as the intermediate processor of a reader mode. I recommend [floki](https://github.com/denisidoro/floki) to quickly explore the output without a REPL.
 
 ## Sources
 
@@ -13,12 +15,13 @@ The following platforms are available.
 - [`n+1`](#n1)
 - [`spike-art-magazine`](#spike-art-magazine)
 - [`substack`](#substack)
+- [`system`](#system-magazine)
 
 Scraping will return as many posts as possible, each with at least this data:
 
 - `:url`
-- `:content`
-- `:source` (author or publication name)
+- `:content` a vector of HTML strings of the main content
+- `:source` author with publication name fallback
 - `:title`
 - `:hero`
 - `:byline`
@@ -92,4 +95,24 @@ Todo:
 
 - Ignore paywalled posts and/or authenticate.
 
-[^1]: 3
+### System Magazine
+
+Will return all posts published online, with additional keys `:introduction` and `:issue`.
+
+Key | Description | Default | Required?
+--- | --- | --- | ---
+`:query` | `"issues"`, `"archive"`, `"editorial"` | | Yes
+`:slug` | Web location, e.g `"system-portfolio"`, `"issue-18"` | | Yes unless `"archive"` query
+
+example:
+
+```sh
+bb scrape :platform system :query issues :slug issue-18 :outfile target/system.edn
+```
+
+## Projectwide todos:
+
+- Multimethod hierarchies
+- Auto generate README
+
+[^1]: 4
