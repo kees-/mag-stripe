@@ -1,6 +1,7 @@
 (ns mag-stripe.post
   (:require [etaoin.api :as e]
-            [mag-stripe.util :as util]))
+            [mag-stripe.util :as util]
+            [mag-stripe.helpers.nplusone :as n+1]))
 
 (defn- outer-htmlv
   [d data]
@@ -19,12 +20,15 @@
 
 (defmethod parse* :n+1
   [_ d post]
-  (assoc
-   post
-   :content (outer-htmlv d (e/query-all d {:css ".post-wrapper > *"}))
-   :hero (e/get-element-attr d {:css ".post-hero"} "outerHTML")
-   :byline (e/get-element-text d {:css ".post-dek"})
-   :datetime (datetime-meta d)))
+  (let [parent (if (e/exists? d {:class :post-wrapper})
+                 ".post-wrapper > *" ".post-body > *")]
+    (assoc
+     post
+     :paywalled? (n+1/paywalled? d)
+     :content (outer-htmlv d (e/query-all d {:css parent}))
+     :datetime (datetime-meta d)
+     :byline (e/get-element-text d {:css ".post-dek"})
+     :hero (e/get-element-attr d {:css ".post-hero"} "outerHTML"))))
 
 (defmethod parse* :spike-art-magazine
   [_ d post]

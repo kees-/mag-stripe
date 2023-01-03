@@ -90,5 +90,10 @@
                           [])))]
     (fs/create-dirs (fs/parent outfile))
     (when (:append? opts) (println (count (:existing opts)) "existing posts found."))
-    (spit outfile (scrape opts))
+    (->> (scrape opts)
+         (remove :paywalled?)
+         (sort-by :datetime)
+         reverse
+         (mapv #(dissoc % :paywalled?))
+         (spit outfile))
     (println "Complete" (char 0x3020))))

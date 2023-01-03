@@ -10,9 +10,9 @@
 
 The following platforms are available.
 
-- `:n+1`
-- `:substack`
-- `:spike-art-magazine`
+- [`n+1`](#n1)
+- [`spike-art-magazine`](#spike-art-magazine)
+- [`substack`](#substack)
 
 Scraping will return as many posts as possible, each with at least this data:
 
@@ -57,7 +57,6 @@ bb scrape :platform n+1 :query magazine :slug issue-33
 Todo:
 
 - Attend to "load more" button on long lists
-- Skip paywalled articles
 
 ### Spike Art Magazine
 
@@ -89,6 +88,8 @@ Example:
 bb scrape :platform substack :domain 'https://circularrainbowmonasteries.substack.com/'
 ```
 
-TODO, ignore paywalled posts and/or authenticate.
+Todo:
+
+- Ignore paywalled posts and/or authenticate.
 
 [^1]: 3
